@@ -47,6 +47,9 @@ public class ProjectService {
      */
     public ProjectDTO createProject(CreateProjectRequest request) {
         if (projectRepository.findByName(request.getName()).isPresent()) {
+            /*TODO: Сейчас это для все проектов, когда добавятся пользователь постараться переделать под конкретного пользователя.
+                Чтобы пользователь не мог добавить проект с наименованием, которое уже есть у него.
+             */
             throw new IllegalArgumentException("Project name already exists");
         }
 

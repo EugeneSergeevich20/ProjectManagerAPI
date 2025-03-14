@@ -4,6 +4,10 @@ server:
     include-message: always
     include-binding-errors: always
 
+jwt:
+  secret: secret_key
+  lifetime: 30m
+
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/project_management_db
