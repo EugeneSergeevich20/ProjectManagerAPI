@@ -45,4 +45,8 @@ public class Task {
     @Builder.Default
     private Set<Tag> tags = new HashSet<>();
 
+    /*@ManyToOne
+    @JoinColumn(name = "assignee_id")
+    private User assignee;*/
+
 }

@@ -10,10 +10,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
@@ -49,6 +46,10 @@ public class JwtTokenUtils {
 
     public List<String> getRoles(String token) {
         return getAllClaimsFromToken(token).get("roles", List.class);
+    }
+
+    public UUID getUserId(String token) {
+        return UUID.fromString(getAllClaimsFromToken(token).getSubject());
     }
 
     private Claims getAllClaimsFromToken(String token) {

@@ -30,6 +30,12 @@ public class UserService {
         return convertUserToDTO(userRepository.save(user));
     }
 
+    public UserDTO getUserByUsername(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException(String.format("Username %s not found", username)));
+        return convertUserToDTO(user);
+    }
+
     private UserDTO convertUserToDTO(User user) {
         return UserDTO.builder()
                 .id(user.getId())

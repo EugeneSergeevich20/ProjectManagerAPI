@@ -4,18 +4,25 @@ import com.manager.projectmanagerapi.dto.JwtRequest;
 import com.manager.projectmanagerapi.dto.JwtResponse;
 import com.manager.projectmanagerapi.dto.RegistrationUserDTO;
 import com.manager.projectmanagerapi.dto.UserDTO;
+import com.manager.projectmanagerapi.entity.User;
 import com.manager.projectmanagerapi.exception.AppError;
 import com.manager.projectmanagerapi.security.UserServiceImpl;
 import com.manager.projectmanagerapi.utils.JwtTokenUtils;
+import io.jsonwebtoken.Jwt;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
+
+import java.nio.file.AccessDeniedException;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -45,5 +52,17 @@ public class AuthService {
         }
         UserDTO userDTO = userService.createUser(registrationUserDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(userDTO);
+    }
+
+    public ResponseEntity<?> getCurrentUser() throws AccessDeniedException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new AccessDeniedException("Unauthorized");
+        }
+
+        //TODO: Протестировать с проектами и задачами. В дальнейшем может быть переделать.
+        UserDTO userDTO = userService.getUserByUsername(authentication.getName());
+        return ResponseEntity.ok(userDTO);
     }
 }
