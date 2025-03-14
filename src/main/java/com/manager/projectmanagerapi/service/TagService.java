@@ -35,7 +35,7 @@ public class TagService {
         if (tagRepository.findByName(request.getName()).isPresent())
             throw new IllegalArgumentException("Tag already exists");
 
-        Tag tag = tagRepository.save(new Tag(null, request.getName(), new HashSet<>()));
+        Tag tag = tagRepository.save(Tag.builder().name(request.getName()).build());
         return new TagDTO(tag.getId(), tag.getName());
     }
 

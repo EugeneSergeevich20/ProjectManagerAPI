@@ -10,6 +10,7 @@ import com.manager.projectmanagerapi.repository.ProjectRepository;
 import com.manager.projectmanagerapi.repository.TagRepository;
 import com.manager.projectmanagerapi.repository.TaskRepository;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -25,12 +26,14 @@ public class TaskService {
     private final TaskRepository taskRepository;
     private final TagRepository tagRepository;
     private final ProjectRepository projectRepository;
+    private final TagService tagService;
 
     /**
      * Задачи проекта
      * @param projectId
      * @return
      */
+    @Transactional
     public List<TaskDTO> getTasksByProject(UUID projectId) {
         return taskRepository.findByProjectId(projectId).stream()
                 .map(this::convertToDTO)
@@ -52,6 +55,7 @@ public class TaskService {
                 .title(request.getTitle())
                 .description(request.getDescription())
                 .project(project)
+                .status(request.getStatus())
                 .tags(tags)
                 .build();
         return convertToDTO(taskRepository.save(task));
@@ -91,11 +95,24 @@ public class TaskService {
      * @param tagNames
      * @return
      */
-    private Set<Tag> getOrCreateTags(Set<String> tagNames) {
+    protected Set<Tag> getOrCreateTags(Set<String> tagNames) {
         if (tagNames == null || tagNames.isEmpty()) return new HashSet<>();
+
+        /*Set<Tag> tags = new HashSet<>();
+        for (String tagName : tagNames) {
+            Tag tag = tagRepository.findByName(tagName)
+                    .orElseGet(() -> {
+                        Tag newTag = new Tag();
+                        newTag.setName(tagName);
+                        return tagRepository.save(newTag);
+                    });
+            tags.add(tag);
+        }
+        return tags;*/
+
         return tagNames.stream()
                 .map(name -> tagRepository.findByName(name)
-                        .orElseGet(() -> tagRepository.save(new Tag(null, name, new HashSet<>()))))
+                        .orElseGet(() -> tagRepository.save(Tag.builder().name(name).build())))
                 .collect(Collectors.toSet());
     }
 
