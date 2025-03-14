@@ -1,47 +1,41 @@
 package com.manager.projectmanagerapi.service;
 
+import com.manager.projectmanagerapi.dto.RegistrationUserDTO;
+import com.manager.projectmanagerapi.dto.UserDTO;
 import com.manager.projectmanagerapi.entity.User;
 import com.manager.projectmanagerapi.repository.UserRepository;
-import com.manager.projectmanagerapi.repository.UserRoleRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class UserService implements UserDetailsService {
+public class UserService {
 
     private final UserRepository userRepository;
-    private final UserRoleRepository userRoleRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final UserRoleService userRoleService;
 
-    public Optional<User> findByUsername(String username) {
-        return userRepository.findByUsername(username);
+    public UserDTO createUser(RegistrationUserDTO registrationUserDTO) {
+        User user = User.builder()
+                .username(registrationUserDTO.getUsername())
+                .email(registrationUserDTO.getEmail())
+                .password(passwordEncoder.encode(registrationUserDTO.getPassword()))
+                .roles(List.of(userRoleService.getUserRole()))
+                .build();
+        return convertUserToDTO(userRepository.save(user));
     }
 
-    @Override
-    @Transactional
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException(String.format("User '%s' not found", username)));
-        return new org.springframework.security.core.userdetails.User(
-                user.getUsername(),
-                user.getPassword(),
-                user.getRoles().stream()
-                        .map(role -> new SimpleGrantedAuthority(role.getName()))
-                        .collect(Collectors.toList())
-        );
+    private UserDTO convertUserToDTO(User user) {
+        return UserDTO.builder()
+                .id(user.getId())
+                .name(user.getUsername())
+                .email(user.getEmail())
+                .build();
     }
 
-    public void createUser(User user) {
-        user.setRoles(List.of(userRoleRepository.findByName("ROLE_USER").get()));
-        userRepository.save(user);
-    }
 }

@@ -1,5 +1,6 @@
 package com.manager.projectmanagerapi.config;
 
+import com.manager.projectmanagerapi.security.UserServiceImpl;
 import com.manager.projectmanagerapi.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -26,7 +27,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 public class SecurityConfig {
 
-    private final UserService userService;
+    private final UserServiceImpl userService;
     private final JwtRequestFilter jwtRequestFilter;
 
     @Bean
