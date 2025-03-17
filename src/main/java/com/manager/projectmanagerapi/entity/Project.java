@@ -34,15 +34,15 @@ public class Project {
     @Builder.Default
     private List<Task> tasks = new ArrayList<>();
 
-    /*@ManyToOne
+    @ManyToOne
     @JoinColumn(name = "owner_id", nullable = false)
-    private User owner;*/
+    private User owner;
 
-    /*@ManyToMany
+    @ManyToMany
     @JoinTable(
             name = "project_users",
             joinColumns = @JoinColumn(name = "project_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
-    private Set<User> participants = new HashSet<>();*/
+    private Set<User> participants = new HashSet<>();
 }

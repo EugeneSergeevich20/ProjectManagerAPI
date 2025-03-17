@@ -3,6 +3,10 @@ package com.manager.projectmanagerapi.controller;
 import com.manager.projectmanagerapi.dto.CreateProjectRequest;
 import com.manager.projectmanagerapi.dto.ProjectDTO;
 import com.manager.projectmanagerapi.dto.UpdateProjectRequest;
+import com.manager.projectmanagerapi.dto.UserDTO;
+import com.manager.projectmanagerapi.exception.AppError;
+import com.manager.projectmanagerapi.exception.UserUnauthorizedException;
+import com.manager.projectmanagerapi.service.AuthService;
 import com.manager.projectmanagerapi.service.ProjectService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.nio.file.AccessDeniedException;
 import java.util.UUID;
 import java.util.List;
 
@@ -19,6 +24,7 @@ import java.util.List;
 public class ProjectController {
 
     private final ProjectService projectService;
+    private final AuthService authService;
 
     @PostMapping("/create")
     public ResponseEntity<ProjectDTO> createProject(@RequestBody @Valid CreateProjectRequest request) {
@@ -32,7 +38,7 @@ public class ProjectController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<ProjectDTO>> getAllProjects() {
+    public ResponseEntity<?> getAllProjects() {
         return ResponseEntity.ok(projectService.getAllProjects());
     }
 

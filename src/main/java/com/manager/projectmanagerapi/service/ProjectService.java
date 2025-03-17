@@ -3,7 +3,9 @@ package com.manager.projectmanagerapi.service;
 import com.manager.projectmanagerapi.dto.CreateProjectRequest;
 import com.manager.projectmanagerapi.dto.ProjectDTO;
 import com.manager.projectmanagerapi.dto.UpdateProjectRequest;
+import com.manager.projectmanagerapi.dto.UserDTO;
 import com.manager.projectmanagerapi.entity.Project;
+import com.manager.projectmanagerapi.exception.UserUnauthorizedException;
 import com.manager.projectmanagerapi.repository.ProjectRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +20,7 @@ import java.util.stream.Collectors;
 public class ProjectService {
 
     private final ProjectRepository projectRepository;
+    private final AuthService authService;
 
     /**
      * Все проекты

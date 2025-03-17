@@ -6,6 +6,7 @@ import com.manager.projectmanagerapi.dto.RegistrationUserDTO;
 import com.manager.projectmanagerapi.dto.UserDTO;
 import com.manager.projectmanagerapi.entity.User;
 import com.manager.projectmanagerapi.exception.AppError;
+import com.manager.projectmanagerapi.exception.UserUnauthorizedException;
 import com.manager.projectmanagerapi.security.UserServiceImpl;
 import com.manager.projectmanagerapi.utils.JwtTokenUtils;
 import io.jsonwebtoken.Jwt;
@@ -54,15 +55,14 @@ public class AuthService {
         return ResponseEntity.status(HttpStatus.CREATED).body(userDTO);
     }
 
-    public ResponseEntity<?> getCurrentUser() throws AccessDeniedException {
+    public UserDTO getCurrentUser() throws UserUnauthorizedException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        if (authentication == null || !authentication.isAuthenticated()) {
-            throw new AccessDeniedException("Unauthorized");
+        if ( !authentication.isAuthenticated() || authentication.getPrincipal() == "anonymousUser") {
+            throw new UserUnauthorizedException("Пользователь не авторизован");
         }
 
         //TODO: Протестировать с проектами и задачами. В дальнейшем может быть переделать.
-        UserDTO userDTO = userService.getUserByUsername(authentication.getName());
-        return ResponseEntity.ok(userDTO);
+        return userService.getUserByUsername(authentication.getName());
     }
 }

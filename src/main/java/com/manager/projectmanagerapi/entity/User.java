@@ -40,12 +40,12 @@ public class User {
     )
     private Collection<UserRole> roles;
 
-    /*@OneToMany(mappedBy = "owner")
+    @OneToMany(mappedBy = "owner")
     private Set<Project> ownedProjects = new HashSet<>();
 
     @ManyToMany(mappedBy = "participants")
     private Set<Project> participatingProjects = new HashSet<>();
 
     @OneToMany(mappedBy = "assignee")
-    private Set<Task> assignedTasks = new HashSet<>();*/
+    private Set<Task> assignedTasks = new HashSet<>();
 }
