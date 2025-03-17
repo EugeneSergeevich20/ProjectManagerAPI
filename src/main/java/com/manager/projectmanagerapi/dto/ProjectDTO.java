@@ -1,11 +1,13 @@
 package com.manager.projectmanagerapi.dto;
 
 import com.manager.projectmanagerapi.entity.ProjectStatus;
+import com.manager.projectmanagerapi.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Map;
 import java.util.UUID;
 
 
@@ -21,4 +23,5 @@ public class ProjectDTO {
     private String name;
     private String description;
     private ProjectStatus status;
+    //private Map<String, User> participants;
 }

@@ -3,9 +3,7 @@ package com.manager.projectmanagerapi.service;
 import com.manager.projectmanagerapi.dto.CreateTaskRequest;
 import com.manager.projectmanagerapi.dto.TaskDTO;
 import com.manager.projectmanagerapi.dto.UpdateTaskRequest;
-import com.manager.projectmanagerapi.entity.Project;
-import com.manager.projectmanagerapi.entity.Tag;
-import com.manager.projectmanagerapi.entity.Task;
+import com.manager.projectmanagerapi.entity.*;
 import com.manager.projectmanagerapi.repository.ProjectRepository;
 import com.manager.projectmanagerapi.repository.TagRepository;
 import com.manager.projectmanagerapi.repository.TaskRepository;
@@ -27,6 +25,7 @@ public class TaskService {
     private final TagRepository tagRepository;
     private final ProjectRepository projectRepository;
     private final TagService tagService;
+    private final UserService userService;
 
     /**
      * Задачи проекта
@@ -55,7 +54,7 @@ public class TaskService {
                 .title(request.getTitle())
                 .description(request.getDescription())
                 .project(project)
-                .status(request.getStatus())
+                .status(TaskStatus.NOT_ASSIGNED)
                 .tags(tags)
                 .build();
         return convertToDTO(taskRepository.save(task));
@@ -87,6 +86,28 @@ public class TaskService {
         if (!taskRepository.existsById(taskId))
             throw new EntityNotFoundException("Task not found");
         taskRepository.deleteById(taskId);
+    }
+
+    /**
+     * Назначение ответственного за задачу
+     * @param taskId
+     * @param userEmail
+     * @return
+     */
+    @Transactional
+    public TaskDTO assignUserToTask(UUID taskId, String userEmail) {
+        User user = userService.getUserByEmail(userEmail);
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new EntityNotFoundException("Task not found"));
+
+        Project project = task.getProject();
+        if (!project.getOwner().equals(user)) {
+            throw new EntityNotFoundException("You are not owner of this project");
+        }
+
+        task.setAssignee(user);
+        task.setStatus(TaskStatus.IN_PROGRESS);
+        return convertToDTO(taskRepository.save(task));
     }
 
     /**

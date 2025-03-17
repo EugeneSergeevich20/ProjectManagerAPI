@@ -5,15 +5,17 @@ import com.manager.projectmanagerapi.dto.ProjectDTO;
 import com.manager.projectmanagerapi.dto.UpdateProjectRequest;
 import com.manager.projectmanagerapi.dto.UserDTO;
 import com.manager.projectmanagerapi.entity.Project;
+import com.manager.projectmanagerapi.entity.User;
 import com.manager.projectmanagerapi.exception.UserUnauthorizedException;
 import com.manager.projectmanagerapi.repository.ProjectRepository;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -21,6 +23,7 @@ public class ProjectService {
 
     private final ProjectRepository projectRepository;
     private final AuthService authService;
+    private final UserService userService;
 
     /**
      * Все проекты
@@ -44,11 +47,51 @@ public class ProjectService {
     }
 
     /**
+     * Проекты пользователя, которые он создал
+     * @return
+     * @throws UserUnauthorizedException
+     */
+    public List<ProjectDTO> getProjectsByUser() throws UserUnauthorizedException {
+        User user = authService.getCurrentUser();
+        return projectRepository.findByOwnerId(user.getId()).stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Проекты, где пользователь участник
+     * @return
+     * @throws UserUnauthorizedException
+     */
+    public List<ProjectDTO> getProjectsByUserParticipants() throws UserUnauthorizedException {
+        User user = authService.getCurrentUser();
+        List<ProjectDTO> projects = new ArrayList<>();
+        for (Project project : user.getParticipatingProjects().values()){
+            if (!project.getOwner().getId().equals(user.getId()))
+                projects.add(convertToDTO(project));
+        }
+        return projects;
+    }
+
+    /**
+     * Все проекты пользователя(которые создал он и где он участвует)
+     * @return
+     * @throws UserUnauthorizedException
+     */
+    public List<ProjectDTO> getAllUsersProjects() throws UserUnauthorizedException {
+        List<ProjectDTO> projects = new ArrayList<>();
+        projects.addAll(getProjectsByUser());
+        projects.addAll(getProjectsByUserParticipants());
+        return projects;
+    }
+
+    /**
      * Добавление новой задачи
      * @param request
      * @return
      */
-    public ProjectDTO createProject(CreateProjectRequest request) {
+    @Transactional
+    public ProjectDTO createProject(CreateProjectRequest request) throws UserUnauthorizedException {
         if (projectRepository.findByName(request.getName()).isPresent()) {
             /*TODO: Сейчас это для все проектов, когда добавятся пользователь постараться переделать под конкретного пользователя.
                 Чтобы пользователь не мог добавить проект с наименованием, которое уже есть у него.
@@ -56,11 +99,47 @@ public class ProjectService {
             throw new IllegalArgumentException("Project name already exists");
         }
 
+        User user = authService.getCurrentUser();
+
         Project project = Project.builder()
                 .name(request.getName())
                 .description(request.getDescription())
                 .status(request.getStatus())
+                .owner(user)
+                .participants(new HashMap<>())
                 .build();
+        project.getParticipants().put(user.getUsername(), user);
+
+        return convertToDTO(projectRepository.save(project));
+    }
+
+    /**
+     * Добавляет участников в проект
+     * @param projectId
+     * @param request
+     * @return
+     * @throws UserUnauthorizedException
+     */
+    @Transactional
+    public ProjectDTO addParticipant(UUID projectId, UpdateProjectRequest request) throws UserUnauthorizedException {
+        User user = authService.getCurrentUser();
+
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new EntityNotFoundException("Project not found"));
+
+        if (!project.getOwner().equals(user)) {
+            throw new UserUnauthorizedException("You do not have permission to add this project");
+        }
+
+        Set<String> emailParticipants = request.getEmailParticipants();
+        Map<String, User> participants = project.getParticipants();
+
+        for (String emailParticipant : emailParticipants) {
+            User userParticipant = userService.getUserByEmail(emailParticipant);
+            if (!participants.containsKey(emailParticipant)) {
+                participants.put(emailParticipant, userParticipant);
+            }
+        }
 
         return convertToDTO(projectRepository.save(project));
     }

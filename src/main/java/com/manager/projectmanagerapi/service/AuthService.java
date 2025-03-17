@@ -55,12 +55,11 @@ public class AuthService {
         return ResponseEntity.status(HttpStatus.CREATED).body(userDTO);
     }
 
-    public UserDTO getCurrentUser() throws UserUnauthorizedException {
+    public User getCurrentUser() throws UserUnauthorizedException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        if ( !authentication.isAuthenticated() || authentication.getPrincipal() == "anonymousUser") {
+        if ( !authentication.isAuthenticated() || authentication.getPrincipal() == "anonymousUser")
             throw new UserUnauthorizedException("Пользователь не авторизован");
-        }
 
         //TODO: Протестировать с проектами и задачами. В дальнейшем может быть переделать.
         return userService.getUserByUsername(authentication.getName());

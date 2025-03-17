@@ -27,7 +27,7 @@ public class ProjectController {
     private final AuthService authService;
 
     @PostMapping("/create")
-    public ResponseEntity<ProjectDTO> createProject(@RequestBody @Valid CreateProjectRequest request) {
+    public ResponseEntity<ProjectDTO> createProject(@RequestBody @Valid CreateProjectRequest request) throws UserUnauthorizedException {
         ProjectDTO createProject = projectService.createProject(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(createProject);
     }
@@ -51,6 +51,27 @@ public class ProjectController {
     public ResponseEntity<Void> deleteProject(@PathVariable UUID id) {
         projectService.deleteProject(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/{projectId}/addParticipant")
+    public ResponseEntity<ProjectDTO> addParticipant(@PathVariable("projectId") UUID projectId, @RequestBody @Valid UpdateProjectRequest request) throws UserUnauthorizedException {
+        return ResponseEntity.ok(projectService.addParticipant(projectId, request));
+    }
+
+    //TODO: Пересмотреть методы по получению проектов пользователя. Протестировать.
+    @GetMapping("/owner")
+    public ResponseEntity<List<ProjectDTO>> getProjectsByUserId() throws UserUnauthorizedException {
+        return ResponseEntity.ok(projectService.getProjectsByUser());
+    }
+
+    @GetMapping("/participant")
+    public ResponseEntity<List<ProjectDTO>> getProjectsByUserParticipants() throws UserUnauthorizedException {
+        return ResponseEntity.ok(projectService.getProjectsByUserParticipants());
+    }
+
+    @GetMapping("/allUsersProjects")
+    public ResponseEntity<List<ProjectDTO>> getAllUsersProjects() throws UserUnauthorizedException {
+        return ResponseEntity.ok(projectService.getAllUsersProjects());
     }
 
 }

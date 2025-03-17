@@ -1,15 +1,9 @@
 package com.manager.projectmanagerapi.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Entity
 @Table(name = "users")
@@ -17,6 +11,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@EqualsAndHashCode(of = "email")
 public class User {
 
     @Id
@@ -40,12 +35,13 @@ public class User {
     )
     private Collection<UserRole> roles;
 
-    @OneToMany(mappedBy = "owner")
-    private Set<Project> ownedProjects = new HashSet<>();
+    //@OneToMany(mappedBy = "owner", fetch = FetchType.EAGER)
+    //private Set<Project> ownedProjects = new HashSet<>();
 
     @ManyToMany(mappedBy = "participants")
-    private Set<Project> participatingProjects = new HashSet<>();
+    @MapKey(name = "name")
+    private Map<String, Project> participatingProjects = new HashMap<>();
 
-    @OneToMany(mappedBy = "assignee")
-    private Set<Task> assignedTasks = new HashSet<>();
+    //@OneToMany(mappedBy = "assignee")
+    //private Set<Task> assignedTasks = new HashSet<>();
 }

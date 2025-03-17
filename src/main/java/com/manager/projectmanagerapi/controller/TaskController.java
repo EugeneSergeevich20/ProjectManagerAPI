@@ -41,4 +41,10 @@ public class TaskController {
         taskService.deleteTask(id);
         return ResponseEntity.noContent().build();
     }
+
+    //TODO: Пересмотреть данный метод. Метод отрабатывает правильно, но меня не устраивает запрос /{taskId}/{userEmail}/assignUser
+    @PutMapping("/{taskId}/{userEmail}/assignUser")
+    public ResponseEntity<TaskDTO> assignUserToTask(@PathVariable("taskId") UUID taskId, @PathVariable("userEmail") String userEmail) {
+        return ResponseEntity.ok(taskService.assignUserToTask(taskId, userEmail));
+    }
 }

@@ -30,13 +30,13 @@ public class AuthController {
         return authService.createNewUser(registrationUserDTO);
     }
 
-    @GetMapping("/test")
-    public ResponseEntity<?> test() throws UserUnauthorizedException {
-        UserDTO userDTO = authService.getCurrentUser();
-        if (userDTO == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-        return ResponseEntity.ok(userDTO);
-    }
+//    @GetMapping("/test")
+//    public ResponseEntity<?> test() throws UserUnauthorizedException {
+//        UserDTO userDTO = authService.getCurrentUser();
+//        if (userDTO == null) {
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+//        }
+//        return ResponseEntity.ok(userDTO);
+//    }
 
 }

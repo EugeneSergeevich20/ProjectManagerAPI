@@ -19,8 +19,8 @@ public class CreateTaskRequest {
     @NotBlank
     private String title;
     private String description;
-    @NotNull
-    private TaskStatus status;
+    /*@NotNull
+    private TaskStatus status;*/
     @NotNull
     private UUID projectId;
     private Set<String> tags;

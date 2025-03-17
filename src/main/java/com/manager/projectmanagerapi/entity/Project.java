@@ -44,5 +44,6 @@ public class Project {
             joinColumns = @JoinColumn(name = "project_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
-    private Set<User> participants = new HashSet<>();
+    @MapKey(name = "email")
+    private Map<String, User> participants = new HashMap<>();
 }
