@@ -17,4 +17,5 @@ public interface TaskRepository extends JpaRepository<Task, UUID> {
     List<Task> findByProjectId(UUID projectId);
     @Query("SELECT t FROM Task t JOIN t.tags tag WHERE tag.name IN :tagNames")
     List<Task> findByTags(@Param("tagNames")Set<String> tags);
+    List<Task> findByAssigneeId(UUID assigneeId);
 }

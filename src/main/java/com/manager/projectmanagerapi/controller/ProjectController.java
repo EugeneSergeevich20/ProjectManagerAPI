@@ -24,19 +24,8 @@ import java.util.List;
 public class ProjectController {
 
     private final ProjectService projectService;
-    private final AuthService authService;
 
-    @PostMapping("/create")
-    public ResponseEntity<?> createProject(@RequestBody @Valid CreateProjectRequest request) {
-        ProjectDTO createProject = null;
-        try {
-            createProject = projectService.createProject(request);
-        } catch (UserUnauthorizedException e) {
-            return new ResponseEntity<>(new AppError(HttpStatus.BAD_REQUEST.value(), e.getMessage()), HttpStatus.BAD_REQUEST);
-        }
-        return ResponseEntity.status(HttpStatus.CREATED).body(createProject);
-    }
-
+    /* Получение всех проектов, получение проектов по критериям*/
     @GetMapping("/{id}")
     public ResponseEntity<ProjectDTO> getProjectById(@PathVariable UUID id) {
         return ResponseEntity.ok(projectService.getProjectById(id));
@@ -45,26 +34,6 @@ public class ProjectController {
     @GetMapping("/all")
     public ResponseEntity<?> getAllProjects() {
         return ResponseEntity.ok(projectService.getAllProjects());
-    }
-
-    @PutMapping("/{id}/update")
-    public ResponseEntity<ProjectDTO> updateProject(@PathVariable UUID id, @RequestBody @Valid UpdateProjectRequest request) {
-        return ResponseEntity.ok(projectService.updateProject(id, request));
-    }
-
-    @DeleteMapping("/{id}/delete")
-    public ResponseEntity<Void> deleteProject(@PathVariable UUID id) {
-        projectService.deleteProject(id);
-        return ResponseEntity.noContent().build();
-    }
-
-    @PutMapping("/{projectId}/addParticipant")
-    public ResponseEntity<?> addParticipant(@PathVariable("projectId") UUID projectId, @RequestBody @Valid UpdateProjectRequest request) {
-        try {
-            return ResponseEntity.ok(projectService.addParticipant(projectId, request));
-        } catch (UserUnauthorizedException e) {
-            return new ResponseEntity<>(new AppError(HttpStatus.BAD_REQUEST.value(), e.getMessage()), HttpStatus.BAD_REQUEST);
-        }
     }
 
     //TODO: Пересмотреть методы по получению проектов пользователя. Протестировать.
@@ -82,5 +51,46 @@ public class ProjectController {
     public ResponseEntity<List<ProjectDTO>> getAllUsersProjects() throws UserUnauthorizedException {
         return ResponseEntity.ok(projectService.getAllUsersProjects());
     }
+
+    /*Добавление проекта*/
+
+    @PostMapping("/create")
+    public ResponseEntity<?> createProject(@RequestBody @Valid CreateProjectRequest request) {
+        ProjectDTO createProject = null;
+        try {
+            createProject = projectService.createProject(request);
+        } catch (UserUnauthorizedException e) {
+            return new ResponseEntity<>(new AppError(HttpStatus.BAD_REQUEST.value(), e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
+        return ResponseEntity.status(HttpStatus.CREATED).body(createProject);
+    }
+
+    /*Обновление проекта*/
+
+    @PutMapping("/{id}/update")
+    public ResponseEntity<ProjectDTO> updateProject(@PathVariable UUID id, @RequestBody @Valid UpdateProjectRequest request) {
+        return ResponseEntity.ok(projectService.updateProject(id, request));
+    }
+
+    @PutMapping("/{projectId}/addParticipant")
+    public ResponseEntity<?> addParticipant(@PathVariable("projectId") UUID projectId, @RequestBody @Valid UpdateProjectRequest request) {
+        try {
+            return ResponseEntity.ok(projectService.addParticipant(projectId, request));
+        } catch (UserUnauthorizedException e) {
+            return new ResponseEntity<>(new AppError(HttpStatus.BAD_REQUEST.value(), e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    /* Удаление проекта */
+
+    @DeleteMapping("/{id}/delete")
+    public ResponseEntity<Void> deleteProject(@PathVariable UUID id) {
+        projectService.deleteProject(id);
+        return ResponseEntity.noContent().build();
+    }
+
+
+
+
 
 }

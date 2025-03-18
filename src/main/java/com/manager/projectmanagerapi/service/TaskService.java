@@ -4,6 +4,7 @@ import com.manager.projectmanagerapi.dto.CreateTaskRequest;
 import com.manager.projectmanagerapi.dto.TaskDTO;
 import com.manager.projectmanagerapi.dto.UpdateTaskRequest;
 import com.manager.projectmanagerapi.entity.*;
+import com.manager.projectmanagerapi.exception.UserUnauthorizedException;
 import com.manager.projectmanagerapi.repository.ProjectRepository;
 import com.manager.projectmanagerapi.repository.TagRepository;
 import com.manager.projectmanagerapi.repository.TaskRepository;
@@ -27,6 +28,7 @@ public class TaskService {
     private final ProjectRepository projectRepository;
     private final TagService tagService;
     private final UserService userService;
+    private final AuthService authService;
 
     /**
      * Задачи проекта
@@ -48,6 +50,18 @@ public class TaskService {
     public List<TaskDTO> getTaskByTags(Set<String> tagNames){
         List<Task> tasks = taskRepository.findByTags(tagNames);
         return tasks.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Авторизованный пользователь получает список задач на которые он назначен
+     * @return
+     * @throws UserUnauthorizedException
+     */
+    public List<TaskDTO> getTasksByUser() throws UserUnauthorizedException {
+        User user = authService.getCurrentUser();
+        return taskRepository.findByAssigneeId(user.getId()).stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }

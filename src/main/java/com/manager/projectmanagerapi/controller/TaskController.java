@@ -3,6 +3,7 @@ package com.manager.projectmanagerapi.controller;
 import com.manager.projectmanagerapi.dto.CreateTaskRequest;
 import com.manager.projectmanagerapi.dto.TaskDTO;
 import com.manager.projectmanagerapi.dto.UpdateTaskRequest;
+import com.manager.projectmanagerapi.exception.UserUnauthorizedException;
 import com.manager.projectmanagerapi.service.TaskService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -21,27 +22,44 @@ public class TaskController {
 
     private final TaskService taskService;
 
-    @PostMapping("/create")
-    public ResponseEntity<TaskDTO> createTask(@RequestBody @Valid CreateTaskRequest request) {
-        TaskDTO createTask = taskService.createTask(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createTask);
-    }
+    /*Получение всех задач и задач по критериям*/
 
     @GetMapping("/project/{projectID}")
     public ResponseEntity<List<TaskDTO>> getTasksByProject(@PathVariable("projectID") UUID projectID) {
         return ResponseEntity.ok(taskService.getTasksByProject(projectID));
     }
 
+    @GetMapping("/byTags")
+    public ResponseEntity<List<TaskDTO>> getTasksByTags(@RequestParam Set<String> tagNames) {
+        List<TaskDTO> tasks = taskService.getTaskByTags(tagNames);
+        return ResponseEntity.ok(tasks);
+    }
+
+    @GetMapping("/byUser")
+    public ResponseEntity<?> getTasksByUser(){
+        List<TaskDTO> tasks;
+        try {
+            tasks = taskService.getTasksByUser();
+        } catch (UserUnauthorizedException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
+        }
+        return ResponseEntity.ok(tasks);
+    }
+
+    /*Добавление задачи*/
+
+    @PostMapping("/create")
+    public ResponseEntity<TaskDTO> createTask(@RequestBody @Valid CreateTaskRequest request) {
+        TaskDTO createTask = taskService.createTask(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createTask);
+    }
+
+    /*Обновление задачи*/
+
     @PutMapping("/{id}/update")
     public ResponseEntity<TaskDTO> updateTask(@PathVariable("id") UUID id, @RequestBody UpdateTaskRequest request) {
         TaskDTO updateTask = taskService.updateTask(id, request);
         return ResponseEntity.ok(updateTask);
-    }
-
-    @DeleteMapping("/{id}/delete")
-    public ResponseEntity<Void> deleteTask(@PathVariable("id") UUID id) {
-        taskService.deleteTask(id);
-        return ResponseEntity.noContent().build();
     }
 
     //TODO: Пересмотреть данный метод. Метод отрабатывает правильно, но меня не устраивает запрос /{taskId}/{userEmail}/assignUser
@@ -50,9 +68,15 @@ public class TaskController {
         return ResponseEntity.ok(taskService.assignUserToTask(taskId, userEmail));
     }
 
-    @GetMapping("/byTags")
-    public ResponseEntity<List<TaskDTO>> getTasksByTags(@RequestParam Set<String> tagNames) {
-        List<TaskDTO> tasks = taskService.getTaskByTags(tagNames);
-        return ResponseEntity.ok(tasks);
+    /*Удаление задачи*/
+
+    @DeleteMapping("/{id}/delete")
+    public ResponseEntity<Void> deleteTask(@PathVariable("id") UUID id) {
+        taskService.deleteTask(id);
+        return ResponseEntity.noContent().build();
     }
+
+
+
+
 }
