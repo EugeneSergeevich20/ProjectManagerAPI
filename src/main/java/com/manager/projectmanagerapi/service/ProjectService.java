@@ -127,6 +127,7 @@ public class ProjectService {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new EntityNotFoundException("Project not found"));
 
+        //TODO: Добавить новый класс исключения
         if (!project.getOwner().equals(user)) {
             throw new UserUnauthorizedException("You do not have permission to add this project");
         }

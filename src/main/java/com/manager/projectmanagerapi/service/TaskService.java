@@ -40,6 +40,18 @@ public class TaskService {
     }
 
     /**
+     * Получаем список задач отфильтрованный по тегам
+     * @param tagNames
+     * @return
+     */
+    public List<TaskDTO> getTaskByTags(Set<String> tagNames){
+        List<Task> tasks = taskRepository.findByTags(tagNames);
+        return tasks.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    /**
      * Добааление новой задачи
      * @param request
      * @return
@@ -118,18 +130,6 @@ public class TaskService {
      */
     protected Set<Tag> getOrCreateTags(Set<String> tagNames) {
         if (tagNames == null || tagNames.isEmpty()) return new HashSet<>();
-
-        /*Set<Tag> tags = new HashSet<>();
-        for (String tagName : tagNames) {
-            Tag tag = tagRepository.findByName(tagName)
-                    .orElseGet(() -> {
-                        Tag newTag = new Tag();
-                        newTag.setName(tagName);
-                        return tagRepository.save(newTag);
-                    });
-            tags.add(tag);
-        }
-        return tags;*/
 
         return tagNames.stream()
                 .map(name -> tagRepository.findByName(name)

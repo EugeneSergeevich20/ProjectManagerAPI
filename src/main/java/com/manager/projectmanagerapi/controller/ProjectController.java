@@ -27,8 +27,13 @@ public class ProjectController {
     private final AuthService authService;
 
     @PostMapping("/create")
-    public ResponseEntity<ProjectDTO> createProject(@RequestBody @Valid CreateProjectRequest request) throws UserUnauthorizedException {
-        ProjectDTO createProject = projectService.createProject(request);
+    public ResponseEntity<?> createProject(@RequestBody @Valid CreateProjectRequest request) {
+        ProjectDTO createProject = null;
+        try {
+            createProject = projectService.createProject(request);
+        } catch (UserUnauthorizedException e) {
+            return new ResponseEntity<>(new AppError(HttpStatus.BAD_REQUEST.value(), e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
         return ResponseEntity.status(HttpStatus.CREATED).body(createProject);
     }
 
@@ -54,8 +59,12 @@ public class ProjectController {
     }
 
     @PutMapping("/{projectId}/addParticipant")
-    public ResponseEntity<ProjectDTO> addParticipant(@PathVariable("projectId") UUID projectId, @RequestBody @Valid UpdateProjectRequest request) throws UserUnauthorizedException {
-        return ResponseEntity.ok(projectService.addParticipant(projectId, request));
+    public ResponseEntity<?> addParticipant(@PathVariable("projectId") UUID projectId, @RequestBody @Valid UpdateProjectRequest request) {
+        try {
+            return ResponseEntity.ok(projectService.addParticipant(projectId, request));
+        } catch (UserUnauthorizedException e) {
+            return new ResponseEntity<>(new AppError(HttpStatus.BAD_REQUEST.value(), e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
     }
 
     //TODO: Пересмотреть методы по получению проектов пользователя. Протестировать.

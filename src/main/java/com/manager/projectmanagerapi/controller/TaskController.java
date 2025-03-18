@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @RestController
@@ -46,5 +47,11 @@ public class TaskController {
     @PutMapping("/{taskId}/{userEmail}/assignUser")
     public ResponseEntity<TaskDTO> assignUserToTask(@PathVariable("taskId") UUID taskId, @PathVariable("userEmail") String userEmail) {
         return ResponseEntity.ok(taskService.assignUserToTask(taskId, userEmail));
+    }
+
+    @GetMapping("/byTags")
+    public ResponseEntity<List<TaskDTO>> getTasksByTags(@RequestParam Set<String> tagNames) {
+        List<TaskDTO> tasks = taskService.getTaskByTags(tagNames);
+        return ResponseEntity.ok(tasks);
     }
 }
