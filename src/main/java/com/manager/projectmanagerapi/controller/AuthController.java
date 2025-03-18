@@ -6,6 +6,7 @@ import com.manager.projectmanagerapi.dto.UserDTO;
 import com.manager.projectmanagerapi.entity.User;
 import com.manager.projectmanagerapi.exception.UserUnauthorizedException;
 import com.manager.projectmanagerapi.service.AuthService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +27,7 @@ public class AuthController {
     }
 
     @PostMapping("/registration")
-    public ResponseEntity<?> createNewUser(@RequestBody RegistrationUserDTO registrationUserDTO){
+    public ResponseEntity<?> createNewUser(@Valid @RequestBody RegistrationUserDTO registrationUserDTO){
         return authService.createNewUser(registrationUserDTO);
     }
 

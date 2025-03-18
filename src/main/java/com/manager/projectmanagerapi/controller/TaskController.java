@@ -4,6 +4,7 @@ import com.manager.projectmanagerapi.dto.CreateTaskRequest;
 import com.manager.projectmanagerapi.dto.TaskDTO;
 import com.manager.projectmanagerapi.dto.UpdateTaskRequest;
 import com.manager.projectmanagerapi.service.TaskService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +22,7 @@ public class TaskController {
     private final TaskService taskService;
 
     @PostMapping("/create")
-    public ResponseEntity<TaskDTO> createTask(@RequestBody CreateTaskRequest request) {
+    public ResponseEntity<TaskDTO> createTask(@RequestBody @Valid CreateTaskRequest request) {
         TaskDTO createTask = taskService.createTask(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(createTask);
     }

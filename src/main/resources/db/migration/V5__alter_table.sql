@@ -1,0 +1,17 @@
+ALTER TABLE users
+    ADD COLUMN first_name VARCHAR(255),
+    ADD COLUMN last_name VARCHAR(255),
+    ADD COLUMN phone_number VARCHAR(255),
+    ADD COLUMN created_at TIMESTAMP DEFAULT NOW();
+
+ALTER TABLE projects
+    ADD COLUMN created_at TIMESTAMP DEFAULT NOW(),
+    ADD COLUMN deadline TIMESTAMP,
+    ADD COLUMN completed_at TIMESTAMP;
+
+ALTER TABLE tasks
+    ADD COLUMN created_at TIMESTAMP DEFAULT NOW(),
+    ADD COLUMN deadline TIMESTAMP,
+    ADD COLUMN completed_at TIMESTAMP,
+    ADD COLUMN priority VARCHAR(20);
+

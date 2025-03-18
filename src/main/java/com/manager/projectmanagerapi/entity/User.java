@@ -3,6 +3,7 @@ package com.manager.projectmanagerapi.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Entity
@@ -26,6 +27,11 @@ public class User {
 
     @Column(nullable = false, unique = true)
     private String email;
+
+    private String firstName;
+    private String lastName;
+    private String phoneNumber;
+    private LocalDateTime createdAt;
 
     @ManyToMany
     @JoinTable(

@@ -12,6 +12,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -65,7 +66,9 @@ public class TaskService {
         Task task = Task.builder()
                 .title(request.getTitle())
                 .description(request.getDescription())
+                .deadline(request.getDeadline())
                 .project(project)
+                .createdAt(LocalDateTime.now())
                 .status(TaskStatus.NOT_ASSIGNED)
                 .tags(tags)
                 .build();
