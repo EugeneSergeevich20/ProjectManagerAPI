@@ -25,7 +25,7 @@ public class ProjectController {
 
     private final ProjectService projectService;
 
-    /* Получение всех проектов, получение проектов по критериям*/
+    /* GET методы*/
     @GetMapping("/{id}")
     public ResponseEntity<ProjectDTO> getProjectById(@PathVariable UUID id) {
         return ResponseEntity.ok(projectService.getProjectById(id));
@@ -52,8 +52,7 @@ public class ProjectController {
         return ResponseEntity.ok(projectService.getAllUsersProjects());
     }
 
-    /*Добавление проекта*/
-
+    /*POST методы*/
     @PostMapping("/create")
     public ResponseEntity<?> createProject(@RequestBody @Valid CreateProjectRequest request) {
         ProjectDTO createProject = null;
@@ -65,8 +64,7 @@ public class ProjectController {
         return ResponseEntity.status(HttpStatus.CREATED).body(createProject);
     }
 
-    /*Обновление проекта*/
-
+    /*PUT методы*/
     @PutMapping("/{id}/update")
     public ResponseEntity<ProjectDTO> updateProject(@PathVariable UUID id, @RequestBody @Valid UpdateProjectRequest request) {
         return ResponseEntity.ok(projectService.updateProject(id, request));
@@ -81,8 +79,7 @@ public class ProjectController {
         }
     }
 
-    /* Удаление проекта */
-
+    /*DELETE методы*/
     @DeleteMapping("/{id}/delete")
     public ResponseEntity<Void> deleteProject(@PathVariable UUID id) {
         projectService.deleteProject(id);
